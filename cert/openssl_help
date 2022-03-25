@@ -1,0 +1,36 @@
+openssl
+MASTERCLASS
+
+----------------------------------------------------------------------
+
+https://www.youtube.com/watch?v=d8OpUcHzTeg&t=312s&ab_channel=theurbanpenguin
+
+----------------------------------------------------------------------
+
+# generate private key 
+openssl genrsa -aes256 -out root-ca/private/ca.key 4096
+
+# generate x509 self signed cert based on conf and private key files
+openssl req -config root-ca.conf -key private/ca.key -new -x509 -days 3650 -sha256 -extensions v3_ca -out certs/ca.crt 
+
+# show cert in human-readable
+openssl x509 -noout -in certs/ca.crt -text
+
+# create signing request (csr) for sub-ca 
+openssl req -config sub-ca.conf -new -key private/sub-ca.key -sha256 -out csr/sub-ca.csr
+
+# compleate signing request (csr)
+openssl ca -config root-ca.conf -extensions v3_intermediate_ca -days 3650 -notext -in ../sub-ca/csr/sub-ca.csr -out ../sub-ca/certs/sub-ca.crt
+
+# create signing request (csr) for server certificate 
+openssl req -key private/server.key -new -sha256 -out csr/server.csr 
+# challange password
+
+# sign certificate for server basesd on its csr 
+openssl ca -config sub-ca.conf -extensions server_cert -days 365 -notext -in ../server/csr/server.csr -out ../server/certs/server.crt 
+
+# verify certificate against CA
+openssl verify -verbose -CAfile ../root-ca/certs/ca.crt  certs/redis.crt
+----------------------------------------------------------------------
+
+
