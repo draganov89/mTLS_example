@@ -16,7 +16,7 @@ func main() {
 
 	http.HandleFunc("/hello", HelloServer)
 	log.Println("Starting server...")
-	err := http.ListenAndServeTLS(":443", "server.crt", "server.key", nil)
+	err := http.ListenAndServeTLS(":8080", "server.crt", "server.key", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
